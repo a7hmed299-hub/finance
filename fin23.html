@@ -963,7 +963,7 @@
 
     // Prevent access without login
     if (!sessionStorage.getItem("loggedIn")) {
-        window.location.href = "animated_login_screen.html"; // adjust filename if different
+        window.location.href = "index.html"; // adjust filename if different
     }
 
     /*************************************************************************
@@ -3085,7 +3085,7 @@
        document.getElementById("logoutBtn").addEventListener("click", () => {
             sessionStorage.removeItem("loggedIn");
             sessionStorage.removeItem("currentUser");
-            window.location.href = "animated_login_screen.html"; // back to login screen
+            window.location.href = "index.html"; // back to login screen
         });
 
 
