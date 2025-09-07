@@ -13,6 +13,7 @@
       animation:gradient 15s ease infinite;
       display:flex; justify-content:center; align-items:center;
       overflow:hidden;
+      padding: 20px; /* Added padding for mobile */
     }
     @keyframes gradient {
       0%{background-position:0% 50%}
@@ -21,7 +22,9 @@
     }
     .container {
       position:relative;
-      width:800px; height:500px;
+      width:800px; 
+      max-width: 100%; /* Ensure it doesn't overflow on mobile */
+      height:500px;
       border-radius:20px;
       backdrop-filter:blur(10px);
       background:rgba(255,255,255,0.1);
@@ -114,31 +117,77 @@
       10%{opacity:1;}
       100%{transform:translateX(800px) translateY(600px) rotate(45deg); opacity:0;}
     }
+    
+    /* Mobile toggle buttons - hidden by default */
+    .mobile-toggle {
+      display: none;
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1001;
+      background: rgba(255,255,255,0.2);
+      padding: 8px 16px;
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+    }
+    .mobile-toggle button {
+      background: transparent;
+      border: none;
+      color: white;
+      padding: 5px 15px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .mobile-toggle button.active {
+      background: rgba(255,255,255,0.3);
+      border-radius: 15px;
+    }
+
     /* Tablets */
     @media (max-width: 768px) {
       .container {
         width: 90%;
         height: auto;
-        padding: 20px 10px;
+        min-height: 500px;
       }
       form {
         max-width: 100%;
-        padding: 20px;
+        padding: 30px;
       }
       h1 {
         font-size: 22px;
+      }
+      .toggle-container {
+        width: 100%;
+        left: 0;
+      }
+      .login-container, .register-container {
+        width: 100%;
+      }
+      .container.active .login-container {
+        transform: translateX(100%);
+      }
+      .container.active .register-container {
+        transform: translateX(0);
       }
     }
 
     /* Phones */
     @media (max-width: 480px) {
+      body {
+        padding: 10px;
+        align-items: flex-start;
+        padding-top: 40px;
+      }
       .container {
-        width: 95%;
+        width: 100%;
         height: auto;
+        min-height: 450px;
         border-radius: 15px;
       }
       form {
-        padding: 15px;
+        padding: 20px;
       }
       h1 {
         font-size: 20px;
@@ -153,6 +202,16 @@
       }
       .toggle-container {
         display: none; /* hide fancy toggle on small screens */
+      }
+      .mobile-toggle {
+        display: flex;
+        gap: 10px;
+      }
+      .form-container {
+        padding: 10px;
+      }
+      .animation-container {
+        display: none; /* Reduce animations for better performance on mobile */
       }
     }
 
@@ -191,6 +250,10 @@
         </div>
       </div>
     </div>
+    <div class="mobile-toggle">
+      <button id="mobileLogin" class="active">Login</button>
+      <button id="mobileRegister">Register</button>
+    </div>
     <div class="animation-container" id="animationContainer">
       <div class="bicycle">🚴</div>
     </div>
@@ -202,23 +265,52 @@
     const loginFormBtn=document.getElementById('loginBtn');
     const registerFormBtn=document.getElementById('registerBtn');
     const animationContainer=document.getElementById('animationContainer');
+    const mobileLoginBtn = document.getElementById('mobileLogin');
+    const mobileRegisterBtn = document.getElementById('mobileRegister');
+    
     registerBtn.addEventListener('click',()=>container.classList.add('active'));
     loginBtn.addEventListener('click',()=>container.classList.remove('active'));
-    for(let i=0;i<15;i++){const s=document.createElement('div');s.classList.add('shape');
-      const size=Math.random()*80+20;s.style.width=`${size}px`;s.style.height=`${size}px`;
-      const colors=['rgba(255,100,100,0.3)','rgba(100,255,100,0.3)','rgba(100,100,255,0.3)','rgba(255,255,100,0.3)','rgba(255,100,255,0.3)','rgba(100,255,255,0.3)'];
-      s.style.background=colors[Math.floor(Math.random()*colors.length)];
-      s.style.left=`${Math.random()*100}%`;s.style.top=`${Math.random()*100}%`;
-      s.style.animationDelay=`${Math.random()*5}s`;s.style.animationDuration=`${15+Math.random()*10}s`;
-      animationContainer.appendChild(s);
+    
+    // Mobile toggle functionality
+    mobileRegisterBtn.addEventListener('click', () => {
+      container.classList.add('active');
+      mobileLoginBtn.classList.remove('active');
+      mobileRegisterBtn.classList.add('active');
+    });
+    
+    mobileLoginBtn.addEventListener('click', () => {
+      container.classList.remove('active');
+      mobileRegisterBtn.classList.remove('active');
+      mobileLoginBtn.classList.add('active');
+    });
+    
+    // Only create animations on larger screens
+    if (window.innerWidth > 480) {
+      for(let i=0;i<15;i++){
+        const s=document.createElement('div');
+        s.classList.add('shape');
+        const size=Math.random()*80+20;
+        s.style.width=`${size}px`;
+        s.style.height=`${size}px`;
+        const colors=['rgba(255,100,100,0.3)','rgba(100,255,100,0.3)','rgba(100,100,255,0.3)','rgba(255,255,100,0.3)','rgba(255,100,255,0.3)','rgba(100,255,255,0.3)'];
+        s.style.background=colors[Math.floor(Math.random()*colors.length)];
+        s.style.left=`${Math.random()*100}%`;
+        s.style.top=`${Math.random()*100}%`;
+        s.style.animationDelay=`${Math.random()*5}s`;
+        s.style.animationDuration=`${15+Math.random()*10}s`;
+        animationContainer.appendChild(s);
+      }
+      
+      setInterval(()=>{
+        const star=document.createElement('div');
+        star.classList.add('star');
+        star.style.left=Math.random()*window.innerWidth+'px';
+        star.style.top=Math.random()*200+'px';
+        animationContainer.appendChild(star);
+        setTimeout(()=>star.remove(),5000);
+      },3000);
     }
-    setInterval(()=>{
-      const star=document.createElement('div');star.classList.add('star');
-      star.style.left=Math.random()*window.innerWidth+'px';
-      star.style.top=Math.random()*200+'px';
-      animationContainer.appendChild(star);
-      setTimeout(()=>star.remove(),5000);
-    },3000);
+    
     let users;
     try {
       users = JSON.parse(localStorage.getItem('users')) || [];
@@ -226,6 +318,7 @@
     } catch (e) {
       users = [];  // fallback if JSON.parse fails
     }
+    
     loginFormBtn.addEventListener('click',(event)=>{
       event.preventDefault();
       const email=document.getElementById('loginEmail').value.trim();
@@ -234,7 +327,10 @@
       if(account){
         sessionStorage.setItem('loggedIn','true');
         sessionStorage.setItem('currentUser',account.user);
-        createConfetti();document.querySelector('.bicycle').style.animation='ride 8s linear forwards';
+        if (window.innerWidth > 480) {
+          createConfetti();
+          document.querySelector('.bicycle').style.animation='ride 8s linear forwards';
+        }
         setTimeout(()=>{window.location.href='fin23.html';},2000);
       }else{alert('Invalid credentials');}
     });
